@@ -20,10 +20,19 @@ public class Interpreter {
 	private void executeStatement(AstNode node) throws Exception {
 		if (node instanceof DispNode) {
 			ArgListNode args = ((DispNode)node).getArgs();
-			for (int i = 0; i < args.children.size(); i++)
+			for (int i = 0; i < args.children.size(); i++)		
 				System.out.print(evaluateNode(args.children.get(i)));
 			System.out.println();
-		} else
+		}
+		else if (node instanceof ConditionalNode) {
+			ConditionalNode ifNode = (ConditionalNode)node;
+			boolean eval = (boolean)evaluateNode(ifNode.getPredicate());
+			if (eval)
+				executeStatement(ifNode.getBody());
+			else if (!eval && ifNode.children.size() >= 3)
+				executeStatement(ifNode.getElseBody());
+		}
+		else
 			evaluateNode(node);
 	}
 	

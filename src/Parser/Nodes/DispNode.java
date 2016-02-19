@@ -13,7 +13,7 @@ public class DispNode extends AstNode {
 		this.args = args;
 	}
 	
-	public static DispNode parse(Parser parser) throws Exception {
+	public static DispNode parse(Parser parser) throws ExpectedException, UnexpectedException {
 		parser.expectToken(TokenType.Identifier, "Disp");
 		ArgListNode args = ArgListNode.parse(parser);
 		return new DispNode(args);

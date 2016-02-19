@@ -24,7 +24,7 @@ public class ConditionalNode extends AstNode {
 		children.add(elseBody);
 	}
 	
-	public static ConditionalNode parse(Parser parser) throws Exception {
+	public static ConditionalNode parse(Parser parser) throws ExpectedException, UnexpectedException {
 		parser.expectToken(TokenType.Identifier, "If");
 		AstNode predicate = ExpressionNode.parse(parser);
 		AstNode body = ExpressionNode.parse(parser);

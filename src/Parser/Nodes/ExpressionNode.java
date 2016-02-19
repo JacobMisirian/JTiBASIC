@@ -4,11 +4,11 @@ import Lexer.TokenType;
 import Parser.*;
 
 public class ExpressionNode extends AstNode {
-	public  static AstNode parse(Parser parser) throws Exception {
+	public  static AstNode parse(Parser parser) throws ExpectedException, UnexpectedException {
 		return parseAssignment(parser);
 	}
 	
-	private static AstNode parseAssignment(Parser parser) throws Exception {
+	private static AstNode parseAssignment(Parser parser) throws ExpectedException, UnexpectedException {
         AstNode left = parseAdditive(parser);
 
         if (parser.acceptToken(TokenType.Assignment))
@@ -17,7 +17,7 @@ public class ExpressionNode extends AstNode {
             return left;
 	}
 	
-    private static AstNode parseAdditive(Parser parser) throws Exception {
+    private static AstNode parseAdditive(Parser parser) throws ExpectedException, UnexpectedException {
         AstNode left = parseMultiplicitive(parser);
         while (parser.matchToken(TokenType.Operation) || parser.matchToken(TokenType.Identifier, "and") || parser.matchToken(TokenType.Identifier, "or")) {
             switch (parser.currentToken().getValue()) {
@@ -45,7 +45,7 @@ public class ExpressionNode extends AstNode {
         return left;
     }
 	
-	private static AstNode parseMultiplicitive(Parser parser) throws Exception {
+	private static AstNode parseMultiplicitive(Parser parser) throws ExpectedException, UnexpectedException {
 		AstNode left = parseComparison(parser);
 		while (parser.matchToken(TokenType.Operation)) {
 			switch (parser.currentToken().getValue()) {
@@ -69,7 +69,7 @@ public class ExpressionNode extends AstNode {
 		return left;
 	}
 	
-    private static AstNode parseComparison(Parser parser) throws Exception {
+    private static AstNode parseComparison(Parser parser) throws ExpectedException, UnexpectedException {
         AstNode left = parseFunctionCall(parser);
         while (parser.matchToken(TokenType.Comparison)) {
             switch ((parser.currentToken().getValue())) {
@@ -105,10 +105,10 @@ public class ExpressionNode extends AstNode {
         return left;
     }
 	
-    private static AstNode parseFunctionCall(Parser parser) throws Exception {
+    private static AstNode parseFunctionCall(Parser parser) throws ExpectedException, UnexpectedException {
         return parseFunctionCall(parser, parseTerm(parser));
     }
-    private static AstNode parseFunctionCall(Parser parser, AstNode left) throws Exception {
+    private static AstNode parseFunctionCall(Parser parser, AstNode left) throws ExpectedException, UnexpectedException {
         if (parser.matchToken(TokenType.Parentheses, "(")) {
             AstNode functionCall = parseFunctionCall(parser, new FunctionCallNode(left, ArgListNode.parse(parser)));
             //parser.ExpectToken(TokenType.Parentheses, ")");
@@ -118,7 +118,7 @@ public class ExpressionNode extends AstNode {
             return left;
     }
 	
-	private static AstNode parseTerm(Parser parser) throws Exception {
+	private static AstNode parseTerm(Parser parser) throws ExpectedException, UnexpectedException {
         if (parser.matchToken(TokenType.Number))
             return new NumberNode(Double.valueOf(parser.expectToken(TokenType.Number).getValue()));
         else if (parser.acceptToken(TokenType.Parentheses, "(")) {
@@ -160,6 +160,6 @@ public class ExpressionNode extends AstNode {
         else if (parser.matchToken(TokenType.Identifier))
             return new IdentifierNode(parser.expectToken(TokenType.Identifier).getValue());
         else
-            throw new Exception("Unexpected " + parser.currentToken().getTokenType() + " in Parser: " + parser.currentToken().getValue() + ".");
+            throw new UnexpectedException(parser.currentToken().getTokenType(), parser.currentToken().getValue());
 	}
 }

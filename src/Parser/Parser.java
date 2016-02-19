@@ -50,15 +50,15 @@ public class Parser {
         return false;
 	}
 	
-	public Token expectToken(TokenType clazz) throws Exception {
+	public Token expectToken(TokenType clazz) throws ExpectedException {
         if (!matchToken(clazz))
-            throw new Exception("Tokens did not match. Expected " + clazz);
+            throw new ExpectedException(clazz, currentToken().getTokenType());
 
         return tokens.get(position++);
 	}
-	public Token expectToken(TokenType clazz, String value) throws Exception {
+	public Token expectToken(TokenType clazz, String value) throws ExpectedException {
         if (!matchToken(clazz, value))
-            throw new Exception("Tokens did not match. Expected " + clazz);
+            throw new ExpectedException(clazz, currentToken().getTokenType(), value, currentToken().getValue());
 
         return tokens.get(position++);
 	}
