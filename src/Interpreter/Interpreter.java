@@ -1,5 +1,7 @@
 package Interpreter;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,12 @@ public class Interpreter {
 	}
 	
 	private void executeStatement(AstNode node) throws Exception {
-		if (node instanceof DispNode) {
+		if (node instanceof CodeBlockNode) {
+			CodeBlockNode block = (CodeBlockNode)node;
+			for (int i = 0; i < block.children.size(); i++)
+				executeStatement(block.children.get(i));
+		}
+		else if (node instanceof DispNode) {
 			ArgListNode args = ((DispNode)node).getArgs();
 			for (int i = 0; i < args.children.size(); i++)		
 				System.out.print(evaluateNode(args.children.get(i)));
@@ -31,6 +38,17 @@ public class Interpreter {
 				executeStatement(ifNode.getBody());
 			else if (!eval && ifNode.children.size() >= 3)
 				executeStatement(ifNode.getElseBody());
+		}
+		else if (node instanceof WhileNode) {
+			WhileNode whileNode = (WhileNode)node;
+			while ((boolean)evaluateNode(whileNode.getPredicate()))
+				executeStatement(whileNode.getBody());
+		}
+		else if (node instanceof RepeatNode) {
+			RepeatNode repeatNode = (RepeatNode)node;
+			do {
+				executeStatement(repeatNode.getBody());
+			} while (!(boolean)evaluateNode(repeatNode.getPredicate()));
 		}
 		else
 			evaluateNode(node);
@@ -49,6 +67,8 @@ public class Interpreter {
 				throw new Exception("Unknown identifier " + identifier);
 			return variables.get(identifier);
 		}
+		else if (node instanceof GetKeyNode) 
+			return new BufferedReader(new InputStreamReader(System.in)).read();
 		else
 			throw new Exception("Unhandled node " + node);
 	}

@@ -155,6 +155,8 @@ public class ExpressionNode extends AstNode {
 
             return block;
         }
+		else if (parser.acceptToken(TokenType.Identifier, "getKey"))
+			return new GetKeyNode();
         else if (parser.matchToken(TokenType.String))
             return new StringNode(parser.expectToken(TokenType.String).getValue());
         else if (parser.matchToken(TokenType.Identifier))
