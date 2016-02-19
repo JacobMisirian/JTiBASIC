@@ -11,12 +11,15 @@ public class MainClass {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		Scanner scanner = new Scanner("Disp \"Hello, World!\"");
-		ArrayList<Token> tokens = scanner.scan();
+		java.util.Scanner scanner = new java.util.Scanner(System.in);
 		Interpreter interpreter = new Interpreter();
-		for (int i = 0; i < tokens.size(); i++)
-			System.out.println(tokens.get(i).toString());
-		
-		interpreter.Interpret(new Parser(tokens).parse());
+		while (true) {
+			String source = scanner.nextLine();
+			ArrayList<Token> tokens = new Scanner(source).scan();
+	//		for (int i = 0; i < tokens.size(); i++)
+		//		System.out.println(tokens.get(i).toString());
+			
+			interpreter.Interpret(new Parser(tokens).parse());
+		}
 	}
 }

@@ -59,8 +59,8 @@ public class Scanner {
 						if (peekChar() == '>') {
 							result.add(new Token(TokenType.Assignment, "->"));
 							position++;
-						}
-						result.add(new Token(TokenType.Operation, "-"));
+						} else
+							result.add(new Token(TokenType.Operation, "-"));
 						break;
 				}
 			}

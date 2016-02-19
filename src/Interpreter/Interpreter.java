@@ -1,5 +1,8 @@
 package Interpreter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import Lexer.TokenType;
 import Parser.*;
 import Parser.Nodes.*;
@@ -32,8 +35,10 @@ public class Interpreter {
 		else if (node instanceof StringNode)
 			return ((StringNode)node).getString();
 		else if (node instanceof IdentifierNode) {
-			System.out.println(((IdentifierNode)node).getIdentifier());
-			return null;
+			String identifier = ((IdentifierNode)node).getIdentifier();
+			if (!variables.containsKey(identifier))
+				throw new Exception("Unknown identifier " + identifier);
+			return variables.get(identifier);
 		}
 		else
 			throw new Exception("Unhandled node " + node);
@@ -51,16 +56,41 @@ public class Interpreter {
 				return getLeft(binNode) / getRight(binNode);
 			case Modulus:
 				return getLeft(binNode) % getRight(binNode);
+			case Assignment:
+				String variable = ((IdentifierNode)binNode.getRight()).getIdentifier();
+				Object value = evaluateNode(binNode.getLeft());
+				if (variables.containsKey(variable))
+					variables.remove(variable);
+				variables.put(variable, value);
+				return value;
+			case Equal:
+				return evaluateNode(binNode.getLeft()).hashCode() == evaluateNode(binNode.getRight()).hashCode();
+			case NotEqual:
+				return evaluateNode(binNode.getLeft()).hashCode() != evaluateNode(binNode.getRight()).hashCode();
+			case GreaterThan:
+				return getLeft(binNode) > getRight(binNode);
+			case LesserThan:
+				return getLeft(binNode) < getRight(binNode);
+			case GreaterThanOrEqual:
+				return getLeft(binNode) >= getRight(binNode);
+			case LesserThanOrEqual:
+				return getLeft(binNode) <= getRight(binNode);
+            case And:
+                return (boolean)evaluateNode(binNode.getLeft()) && (boolean)evaluateNode(binNode.getRight());
+            case Or:
+                return (boolean)evaluateNode(binNode.getLeft()) || (boolean)evaluateNode(binNode.getRight());
 			default:
 				throw new Exception("Unhandled Binary Operation " + binNode.getBinaryOperation());
 		}
 	}
 	
-	private double getLeft(BinaryOpNode binNode) {
-		return ((NumberNode)binNode.getLeft()).getNumber();
+	private double getLeft(BinaryOpNode binNode) throws NumberFormatException, Exception {
+		return Double.valueOf(evaluateNode(binNode.getLeft()).toString());
 	}
 	
-	private double getRight(BinaryOpNode binNode) {
-		return ((NumberNode)binNode.getRight()).getNumber();
+	private double getRight(BinaryOpNode binNode) throws NumberFormatException, Exception {
+		return Double.valueOf(evaluateNode(binNode.getRight()).toString());
 	}
+	
+	private Map<String, Object> variables = new HashMap<String, Object>();
 }
