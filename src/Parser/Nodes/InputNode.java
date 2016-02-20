@@ -1,22 +1,26 @@
 package Parser.Nodes;
 
+import java.util.ArrayList;
+
 import Lexer.TokenType;
 import Parser.*;
 
 public class InputNode extends AstNode {
-	private String variable;
-	public String getVariable() {
-		return variable;
+	private ArrayList<String> variables;
+	public ArrayList<String> getVariable() {
+		return variables;
 	}
 	
-	public InputNode(String variable) {
-		this.variable = variable;
+	public InputNode(ArrayList<String> variables) {
+		this.variables = variables;
 	}
 	
-	public static InputNode parse(Parser parser) throws ExpectedException {
+	public static InputNode parse(Parser parser) throws ExpectedException, UnexpectedException {
 		parser.expectToken(TokenType.Identifier, "Input");
-		String variable = parser.expectToken(TokenType.Identifier).getValue();
-		
-		return new InputNode(variable);
+		ArgListNode args = ArgListNode.parse(parser);
+		ArrayList<String> variables = new ArrayList<String>();
+		for (int i = 0; i < args.children.size(); i++)
+			variables.add(((IdentifierNode)args.children.get(i)).getIdentifier());
+		return new InputNode(variables);
 	}
 }

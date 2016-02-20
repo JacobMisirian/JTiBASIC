@@ -2,6 +2,7 @@ package Interpreter;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import Parser.Nodes.*;
 public class Interpreter {
 	private AstNode ast;
 	private int position;
+	private java.util.Scanner scanner = new java.util.Scanner(System.in);
 	
 	public void Interpret(AstNode tree) throws Exception {
 		ast = tree;
@@ -30,6 +32,23 @@ public class Interpreter {
 			for (int i = 0; i < args.children.size(); i++)		
 				System.out.print(evaluateNode(args.children.get(i)));
 			System.out.println();
+		}
+		else if (node instanceof InputNode) {
+			ArrayList<String> variables = ((InputNode)node).getVariable();
+			for (int i = 0; i < variables.size(); i++) {
+				if (this.variables.containsKey(variables.get(i)))
+					this.variables.remove(variables.get(i));
+				this.variables.put(variables.get(i), scanner.nextLine());
+			}
+		}
+		else if (node instanceof PromptNode) {
+			ArrayList<String> variables = ((PromptNode)node).getVariables();
+			for (int i = 0; i < variables.size(); i++) {
+				if (this.variables.containsKey(variables.get(i)))
+					this.variables.remove(variables.get(i));
+				System.out.print(variables.get(i) + "? ");
+				this.variables.put(variables.get(i), scanner.nextLine());
+			}
 		}
 		else if (node instanceof ConditionalNode) {
 			ConditionalNode ifNode = (ConditionalNode)node;
